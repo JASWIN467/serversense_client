@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Input, Modal, Form, Select, message, Tooltip, Badge, Progress } from 'antd';
+import { Button, Input, Modal, Form, Select, message, Tooltip, Badge, Progress, Tabs } from 'antd';
 import {
     SearchOutlined,
     ReloadOutlined,
