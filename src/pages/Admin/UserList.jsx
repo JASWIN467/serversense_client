@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, Tag, Button, Input, Avatar, Space, Dropdown, message } from 'antd';
 import {
     SearchOutlined,
@@ -7,7 +7,8 @@ import {
     SafetyCertificateOutlined,
     StopOutlined,
     CheckCircleOutlined,
-    TeamOutlined
+    TeamOutlined,
+    KeyOutlined
 } from '@ant-design/icons';
 
 const GlassPanel = ({ children, className = '' }) => (
@@ -16,36 +17,51 @@ const GlassPanel = ({ children, className = '' }) => (
     </div>
 );
 
-const initialUsers = [
-    { key: '1', name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active', lastLogin: '2 mins ago' },
-    { key: '2', name: 'Jane Smith', email: 'jane@example.com', role: 'User', status: 'Active', lastLogin: '1 hour ago' },
-    { key: '3', name: 'Robert Johnson', email: 'robert@tech.com', role: 'User', status: 'Inactive', lastLogin: '3 days ago' },
-    { key: '4', name: 'Emily Davis', email: 'emily@design.io', role: 'User', status: 'Active', lastLogin: '5 hours ago' },
-    { key: '5', name: 'Michael Brown', email: 'mike@admin.net', role: 'Admin', status: 'Active', lastLogin: '1 day ago' },
-];
-
 const UserList = () => {
-    const [users, setUsers] = useState(initialUsers);
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const fetchUsers = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch('https://serversense-server.onrender.com/api/users');
+            if (response.ok) {
+                const data = await response.json();
+                setUsers(data);
+            } else {
+                message.error('Failed to fetch users');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            message.error('Error fetching users');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleMenuClick = (e, record) => {
         if (e.key === 'deactivate') {
-            message.success(`Deactivated user ${record.name}`);
+            message.success(`Deactivated user ${record.username}`);
         } else if (e.key === 'promote') {
-            message.success(`Promoted ${record.name} to Admin`);
+            message.success(`Promoted ${record.username} to Admin`);
         }
     };
 
     const columns = [
         {
             title: 'User',
-            dataIndex: 'name',
-            key: 'name',
+            dataIndex: 'username',
+            key: 'username',
             render: (text, record) => (
                 <div className="flex items-center gap-3">
                     <Avatar
                         icon={<UserOutlined />}
-                        className={`bg-gradient-to-br ${record.role === 'Admin' ? 'from-sky-500 to-blue-600' : 'from-purple-500 to-pink-500'}`}
+                        className={`bg-gradient-to-br ${record.role === 'admin' ? 'from-sky-500 to-blue-600' : 'from-purple-500 to-pink-500'}`}
                     />
                     <div>
                         <div className="font-semibold text-gray-200">{text}</div>
@@ -60,34 +76,38 @@ const UserList = () => {
             key: 'role',
             render: (role) => (
                 <Tag
-                    icon={role === 'Admin' ? <SafetyCertificateOutlined /> : <UserOutlined />}
+                    icon={role === 'admin' ? <SafetyCertificateOutlined /> : <UserOutlined />}
                     className={`
                         border-none px-2 py-1 rounded-md flex w-fit items-center gap-1
-                        ${role === 'Admin'
+                        ${role === 'admin'
                             ? 'bg-sky-500/10 text-sky-400'
                             : 'bg-purple-500/10 text-purple-400'}
                     `}
                 >
-                    {role}
+                    {role ? role.toUpperCase() : 'USER'}
                 </Tag>
             ),
         },
         {
-            title: 'Status',
-            dataIndex: 'status',
-            key: 'status',
-            render: (status) => (
-                <div className="flex items-center gap-2">
-                    <div className={`w-1.5 h-1.5 rounded-full ${status === 'Active' ? 'bg-emerald-500 shadow-[0_0_8px_emerald]' : 'bg-gray-500'}`} />
-                    <span className={status === 'Active' ? 'text-gray-300' : 'text-gray-500'}>{status}</span>
+            title: 'Password (Hashed)',
+            dataIndex: 'password',
+            key: 'password',
+            render: (text) => (
+                <div className="flex items-center gap-2 text-gray-500 text-xs font-mono truncate max-w-[150px]" title={text}>
+                    <KeyOutlined />
+                    {text ? `${text.substring(0, 10)}...` : 'Hidden'}
                 </div>
             ),
         },
         {
-            title: 'Last Login',
-            dataIndex: 'lastLogin',
-            key: 'lastLogin',
-            render: (text) => <span className="text-gray-500 text-sm">{text}</span>,
+            title: 'Status',
+            key: 'status',
+            render: () => (
+                <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_emerald]" />
+                    <span className="text-gray-300">Active</span>
+                </div>
+            ),
         },
         {
             title: '',
@@ -112,8 +132,8 @@ const UserList = () => {
     ];
 
     const filteredUsers = users.filter(user =>
-        user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchText.toLowerCase())
+        (user.username && user.username.toLowerCase().includes(searchText.toLowerCase())) ||
+        (user.email && user.email.toLowerCase().includes(searchText.toLowerCase()))
     );
 
     return (
@@ -149,6 +169,8 @@ const UserList = () => {
                 <Table
                     columns={columns}
                     dataSource={filteredUsers}
+                    rowKey="_id"
+                    loading={loading}
                     pagination={{ pageSize: 8 }}
                     className="custom-table"
                 />
