@@ -47,6 +47,7 @@ const initialData = [
 const ServerList = () => {
     const [servers, setServers] = useState(initialData);
     const [searchText, setSearchText] = useState('');
+    const [activeTab, setActiveTab] = useState('all'); // Add activeTab state
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [form] = Form.useForm();
@@ -216,7 +217,8 @@ const ServerList = () => {
 
             {/* Tabs & Search */}
             <Tabs
-                defaultActiveKey="all"
+                activeKey={activeTab}
+                onChange={setActiveTab}
                 className="custom-tabs"
                 items={[
                     {
