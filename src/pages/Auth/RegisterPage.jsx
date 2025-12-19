@@ -1,17 +1,32 @@
-import React from 'react';
-import { Form, Input, Button, Checkbox } from 'antd';
+import React, { useState } from 'react';
+import { Form, Input, Button, Checkbox, message } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, GoogleOutlined, GithubOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import Threads from '../../pages/Threads/Threads';
+import { authService } from '../../services/authService';
 
 const RegisterPage = () => {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
-    const onFinish = (values) => {
-        console.log('Received values of form: ', values);
-        // Mock registration success - redirect to login
-        navigate('/login');
+    const onFinish = async (values) => {
+        setLoading(true);
+        try {
+            // Note: Email is not yet in backend User model, but we can send it or ignore it for now.
+            // Sending username and password as per current backend.
+            await authService.register({
+                username: values.username,
+                password: values.password,
+                email: values.email
+            });
+            message.success('Registration successful! Please login.');
+            navigate('/login');
+        } catch (error) {
+            message.error(error.message || 'Registration failed');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
