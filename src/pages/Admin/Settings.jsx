@@ -289,17 +289,10 @@ const Settings = () => {
     );
 
     // Ant Design items for Tabs
-    // Ant Design items for Tabs
     const items = [
         { key: '1', label: <span className="flex items-center gap-2"><UserOutlined /> Profile</span>, children: <ProfileSettings /> },
-        { key: '3', label: <span className="flex items-center gap-2"><LockOutlined /> Security</span>, children: <SecuritySettings /> },
-        { key: '4', label: <span className="flex items-center gap-2"><SettingOutlined /> Thresholds</span>, children: <ThresholdSettings /> },
+        { key: '2', label: <span className="flex items-center gap-2"><BellOutlined /> Notifications</span>, children: <NotificationSettings /> }
     ];
-
-    // Add WarningOutlined to the import since it is used in NotificationSettings
-    // Oh I missed importing WarningOutlined in the top import statement, let me fix that in the real file write.
-    // Actually I can just add it to the import list in the "CodeContent" string above. 
-    // I see I already imported WarningOutlined in the top block so it should be fine.
 
     return (
         <div className="space-y-6 text-gray-200 max-w-5xl mx-auto">
@@ -309,7 +302,7 @@ const Settings = () => {
                     Settings
                     <SettingOutlined className="text-gray-600 animate-spin-slow" style={{ animationDuration: '10s' }} />
                 </h1>
-                <p className="text-sm text-gray-500">Manage your account and utilization preferences.</p>
+                <p className="text-sm text-gray-500">Manage your account and preferences.</p>
             </div>
 
             <Tabs defaultActiveKey="1" items={items} />

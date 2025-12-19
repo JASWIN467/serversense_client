@@ -214,47 +214,159 @@ const ServerList = () => {
                 </GlassPanel>
             </div>
 
-            {/* Filter */}
-            <Input
-                placeholder="Search nodes by name or IP..."
-                prefix={<SearchOutlined className="text-gray-600" />}
-                className="max-w-md bg-[#0a0a0a] border-white/10 text-white placeholder:text-gray-600"
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-            />
+            {/* Tabs & Search */}
+            <Tabs
+                defaultActiveKey="all"
+                className="custom-tabs"
+                items={[
+                    {
+                        key: 'all',
+                        label: 'All Nodes',
+                        children: (
+                            <>
+                                <Input
+                                    placeholder="Search nodes by name or IP..."
+                                    prefix={<SearchOutlined className="text-gray-600" />}
+                                    className="max-w-md bg-[#0a0a0a] border-white/10 text-white placeholder:text-gray-600 mb-6"
+                                    value={searchText}
+                                    onChange={e => setSearchText(e.target.value)}
+                                />
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {servers.filter(s => s.name.toLowerCase().includes(searchText.toLowerCase()) || s.ip.includes(searchText)).map(server => (
+                                        <GlassPanel key={server.key} className="p-5 hover:border-white/20 transition-all duration-300">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`p-2 rounded-lg ${server.status === 'Online' ? 'bg-emerald-500/10 text-emerald-500' : server.status === 'Warning' ? 'bg-amber-500/10 text-amber-500' : 'bg-red-500/10 text-red-500'}`}>
+                                                        <GlobalOutlined />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-bold text-gray-200">{server.name}</h4>
+                                                        <p className="text-xs text-gray-500 font-mono">{server.ip}</p>
+                                                    </div>
+                                                </div>
+                                                <Tooltip title={`Status: ${server.status}`}>
+                                                    <div className={`w-2 h-2 rounded-full ${server.status === 'Online' ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : server.status === 'Warning' ? 'bg-amber-500 shadow-[0_0_8px_#f59e0b]' : 'bg-red-500 shadow-[0_0_8px_#ef4444]'}`} />
+                                                </Tooltip>
+                                            </div>
 
-            {/* Node Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {servers.filter(s => s.name.toLowerCase().includes(searchText.toLowerCase()) || s.ip.includes(searchText)).map(server => (
-                    <GlassPanel key={server.key} className="p-5 hover:border-white/20 transition-all duration-300">
-                        <div className="flex justify-between items-start mb-4">
-                            <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-lg ${server.status === 'Online' ? 'bg-emerald-500/10 text-emerald-500' : server.status === 'Warning' ? 'bg-amber-500/10 text-amber-500' : 'bg-red-500/10 text-red-500'}`}>
-                                    <GlobalOutlined />
+                                            <div className="space-y-4 mb-4">
+                                                <MetricBar label="CPU Usage" value={server.cpu} color={server.cpu > 80 ? 'bg-red-500' : server.cpu > 60 ? 'bg-amber-500' : 'bg-sky-500'} />
+                                                <MetricBar label="Memory" value={server.ram} color={server.ram > 80 ? 'bg-red-500' : server.ram > 60 ? 'bg-purple-500' : 'bg-blue-500'} />
+                                                <MetricBar label="Disk Space" value={server.disk} color="bg-gray-500" />
+                                            </div>
+
+                                            <div className="flex justify-between items-center text-xs text-gray-500 pt-4 border-t border-white/5">
+                                                <span className="flex items-center gap-1"><HeartOutlined /> {server.heartbeat}</span>
+                                                <span>{server.region}</span>
+                                            </div>
+                                        </GlassPanel>
+                                    ))}
                                 </div>
-                                <div>
-                                    <h4 className="font-bold text-gray-200">{server.name}</h4>
-                                    <p className="text-xs text-gray-500 font-mono">{server.ip}</p>
-                                </div>
+                            </>
+                        )
+                    },
+                    {
+                        key: 'online',
+                        label: <span className="text-emerald-500">Healthy</span>,
+                        children: (
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {servers.filter(s => s.status === 'Online' && (s.name.toLowerCase().includes(searchText.toLowerCase()) || s.ip.includes(searchText))).map(server => (
+                                    <GlassPanel key={server.key} className="p-5 hover:border-white/20 transition-all duration-300">
+                                        {/* Duplicate Card logic for simplicity, normally would extract to component */}
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
+                                                    <GlobalOutlined />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-gray-200">{server.name}</h4>
+                                                    <p className="text-xs text-gray-500 font-mono">{server.ip}</p>
+                                                </div>
+                                            </div>
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+                                        </div>
+                                        <div className="space-y-4 mb-4">
+                                            <MetricBar label="CPU Usage" value={server.cpu} color={server.cpu > 80 ? 'bg-red-500' : server.cpu > 60 ? 'bg-amber-500' : 'bg-sky-500'} />
+                                            <MetricBar label="Memory" value={server.ram} color={server.ram > 80 ? 'bg-red-500' : server.ram > 60 ? 'bg-purple-500' : 'bg-blue-500'} />
+                                            <MetricBar label="Disk Space" value={server.disk} color="bg-gray-500" />
+                                        </div>
+                                        <div className="flex justify-between items-center text-xs text-gray-500 pt-4 border-t border-white/5">
+                                            <span className="flex items-center gap-1"><HeartOutlined /> {server.heartbeat}</span>
+                                            <span>{server.region}</span>
+                                        </div>
+                                    </GlassPanel>
+                                ))}
                             </div>
-                            <Tooltip title={`Status: ${server.status}`}>
-                                <div className={`w-2 h-2 rounded-full ${server.status === 'Online' ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : server.status === 'Warning' ? 'bg-amber-500 shadow-[0_0_8px_#f59e0b]' : 'bg-red-500 shadow-[0_0_8px_#ef4444]'}`} />
-                            </Tooltip>
-                        </div>
-
-                        <div className="space-y-4 mb-4">
-                            <MetricBar label="CPU Usage" value={server.cpu} color={server.cpu > 80 ? 'bg-red-500' : server.cpu > 60 ? 'bg-amber-500' : 'bg-sky-500'} />
-                            <MetricBar label="Memory" value={server.ram} color={server.ram > 80 ? 'bg-red-500' : server.ram > 60 ? 'bg-purple-500' : 'bg-blue-500'} />
-                            <MetricBar label="Disk Space" value={server.disk} color="bg-gray-500" />
-                        </div>
-
-                        <div className="flex justify-between items-center text-xs text-gray-500 pt-4 border-t border-white/5">
-                            <span className="flex items-center gap-1"><HeartOutlined /> {server.heartbeat}</span>
-                            <span>{server.region}</span>
-                        </div>
-                    </GlassPanel>
-                ))}
-            </div>
+                        )
+                    },
+                    {
+                        key: 'warning',
+                        label: <span className="text-amber-500">Warning</span>,
+                        children: (
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {servers.filter(s => s.status === 'Warning' && (s.name.toLowerCase().includes(searchText.toLowerCase()) || s.ip.includes(searchText))).map(server => (
+                                    <GlassPanel key={server.key} className="p-5 hover:border-white/20 transition-all duration-300">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500">
+                                                    <GlobalOutlined />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-gray-200">{server.name}</h4>
+                                                    <p className="text-xs text-gray-500 font-mono">{server.ip}</p>
+                                                </div>
+                                            </div>
+                                            <div className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_#f59e0b]" />
+                                        </div>
+                                        <div className="space-y-4 mb-4">
+                                            <MetricBar label="CPU Usage" value={server.cpu} color={server.cpu > 80 ? 'bg-red-500' : server.cpu > 60 ? 'bg-amber-500' : 'bg-sky-500'} />
+                                            <MetricBar label="Memory" value={server.ram} color={server.ram > 80 ? 'bg-red-500' : server.ram > 60 ? 'bg-purple-500' : 'bg-blue-500'} />
+                                            <MetricBar label="Disk Space" value={server.disk} color="bg-gray-500" />
+                                        </div>
+                                        <div className="flex justify-between items-center text-xs text-gray-500 pt-4 border-t border-white/5">
+                                            <span className="flex items-center gap-1"><HeartOutlined /> {server.heartbeat}</span>
+                                            <span>{server.region}</span>
+                                        </div>
+                                    </GlassPanel>
+                                ))}
+                            </div>
+                        )
+                    },
+                    {
+                        key: 'critical',
+                        label: <span className="text-red-500">Critical</span>,
+                        children: (
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {servers.filter(s => s.status === 'Offline' && (s.name.toLowerCase().includes(searchText.toLowerCase()) || s.ip.includes(searchText))).map(server => (
+                                    <GlassPanel key={server.key} className="p-5 hover:border-white/20 transition-all duration-300">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 rounded-lg bg-red-500/10 text-red-500">
+                                                    <GlobalOutlined />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-gray-200">{server.name}</h4>
+                                                    <p className="text-xs text-gray-500 font-mono">{server.ip}</p>
+                                                </div>
+                                            </div>
+                                            <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]" />
+                                        </div>
+                                        <div className="space-y-4 mb-4">
+                                            <MetricBar label="CPU Usage" value={server.cpu} color={server.cpu > 80 ? 'bg-red-500' : server.cpu > 60 ? 'bg-amber-500' : 'bg-sky-500'} />
+                                            <MetricBar label="Memory" value={server.ram} color={server.ram > 80 ? 'bg-red-500' : server.ram > 60 ? 'bg-purple-500' : 'bg-blue-500'} />
+                                            <MetricBar label="Disk Space" value={server.disk} color="bg-gray-500" />
+                                        </div>
+                                        <div className="flex justify-between items-center text-xs text-gray-500 pt-4 border-t border-white/5">
+                                            <span className="flex items-center gap-1"><HeartOutlined /> {server.heartbeat}</span>
+                                            <span>{server.region}</span>
+                                        </div>
+                                    </GlassPanel>
+                                ))}
+                            </div>
+                        )
+                    }
+                ]}
+            />
 
             {/* Modal */}
             <Modal
