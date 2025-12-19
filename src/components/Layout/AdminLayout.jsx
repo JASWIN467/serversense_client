@@ -60,14 +60,39 @@ const AdminLayout = () => {
         }
     };
 
-    // ...
+    const userMenu = {
+        items: [
+            {
+                key: 'profile',
+                label: 'Profile',
+                icon: <UserOutlined />,
+            },
+            {
+                key: 'logout',
+                label: 'Logout',
+                icon: <LogoutOutlined />,
+                danger: true,
+            },
+        ],
+        onClick: handleMenuClick
+    };
 
     return (
         <Layout className="min-h-screen font-sans">
             <Sider
-            // ... props
+                trigger={null}
+                collapsible
+                collapsed={collapsed}
+                width={260}
+                className="border-r border-gray-800"
+                style={{ background: '#050505' }} // Match body bg
             >
-                {/* ... logo */}
+                <div className="h-16 flex items-center justify-center border-b border-gray-800">
+                    <span className={`text-xl font-bold tracking-tighter text-white transition-opacity duration-300 ${collapsed ? 'opacity-0 hidden' : 'opacity-100'}`}>
+                        SERVER<span className="text-primary/90 drop-shadow-[0_0_8px_rgba(14,165,233,0.5)]">SENSE</span>
+                    </span>
+                    {collapsed && <span className="text-xl font-bold text-primary">S</span>}
+                </div>
 
                 <Menu
                     theme="dark"
