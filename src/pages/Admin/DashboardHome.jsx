@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Tabs, Badge, Progress, Button, Select } from 'antd';
+import ServerList from './ServerList';
 import {
     CloudServerOutlined,
     HddOutlined,
@@ -301,59 +302,7 @@ const AlertsTab = () => (
 
 // --- TAB 4: CLUSTER HEALTH ---
 const ClusterHealthTab = () => (
-    <div className="space-y-6">
-        <GlassPanel className="p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-white">Node Status Grid</h3>
-                <div className="flex gap-4 text-xs">
-                    <span className="flex items-center gap-2 text-gray-400"><span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_5px_emerald]" /> Healthy</span>
-                    <span className="flex items-center gap-2 text-gray-400"><span className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_5px_amber]" /> Warning</span>
-                    <span className="flex items-center gap-2 text-gray-400"><span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_5px_red]" /> Critical</span>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {mockNodes.map((node) => (
-                    <div
-                        key={node.id}
-                        className={`
-                            relative h-24 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:scale-105 cursor-pointer
-                            ${node.status === 'ok' ? 'bg-emerald-500/5 border-emerald-500/20 hover:bg-emerald-500/10 hover:shadow-[0_0_15px_rgba(16,185,129,0.2)]' :
-                                node.status === 'warning' ? 'bg-amber-500/5 border-amber-500/20 hover:bg-amber-500/10 hover:shadow-[0_0_15px_rgba(245,158,11,0.2)]' :
-                                    'bg-red-500/5 border-red-500/20 hover:bg-red-500/10 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)]'}
-                        `}
-                    >
-                        <NodeIndexOutlined className={`text-xl ${node.status === 'ok' ? 'text-emerald-500' : node.status === 'warning' ? 'text-amber-500' : 'text-red-500'}`} />
-                        <span className="text-gray-300 font-medium text-xs uppercase">{node.id}</span>
-                        <div className="absolute inset-x-2 bottom-2 h-1 bg-gray-800 rounded-full overflow-hidden">
-                            <div className={`h-full ${node.status === 'ok' ? 'bg-emerald-500' : node.status === 'warning' ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${node.load}%` }} />
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </GlassPanel>
-
-        <Row gutter={20}>
-            <Col span={12}>
-                <GlassPanel className="p-6 h-[250px] flex flex-col justify-center items-center text-center">
-                    <div className="w-16 h-16 rounded-full bg-sky-500/10 flex items-center justify-center text-3xl text-sky-500 mb-4">
-                        99.99%
-                    </div>
-                    <h4 className="text-white font-bold text-lg">Cluster Availability</h4>
-                    <p className="text-gray-500 text-sm mt-1">Last 30 Days</p>
-                </GlassPanel>
-            </Col>
-            <Col span={12}>
-                <GlassPanel className="p-6 h-[250px] flex flex-col justify-center items-center text-center">
-                    <div className="w-16 h-16 rounded-full bg-purple-500/10 flex items-center justify-center text-3xl text-purple-500 mb-4">
-                        <CheckCircleOutlined />
-                    </div>
-                    <h4 className="text-white font-bold text-lg">Redundancy Status</h4>
-                    <p className="text-gray-500 text-sm mt-1">N+2 Redundancy Active</p>
-                </GlassPanel>
-            </Col>
-        </Row>
-    </div>
+    <ServerList />
 );
 
 // --- MAIN DASHBOARD COMPONENT ---
