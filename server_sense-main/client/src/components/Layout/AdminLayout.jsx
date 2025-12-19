@@ -11,7 +11,7 @@ import {
     MenuUnfoldOutlined,
     BellOutlined
 } from '@ant-design/icons';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const { Header, Sider, Content } = Layout;
@@ -20,31 +20,33 @@ const AdminLayout = () => {
     const [collapsed, setCollapsed] = useState(false);
     const location = useLocation();
 
+    const navigate = useNavigate();
+
     const menuItems = [
         {
             key: '/admin',
             icon: <DashboardOutlined />,
-            label: <Link to="/admin">Dashboard</Link>,
+            label: 'Dashboard',
         },
         {
             key: '/admin/servers',
             icon: <CloudServerOutlined />,
-            label: <Link to="/admin/servers">Servers</Link>,
+            label: 'Servers',
         },
         {
             key: '/admin/alerts',
             icon: <AlertOutlined />,
-            label: <Link to="/admin/alerts">Alerts</Link>,
+            label: 'Alerts',
         },
         {
             key: '/admin/users',
             icon: <UserOutlined />,
-            label: <Link to="/admin/users">Users</Link>,
+            label: 'Users',
         },
         {
             key: '/admin/settings',
             icon: <SettingOutlined />,
-            label: <Link to="/admin/settings">Settings</Link>,
+            label: 'Settings',
         },
     ];
 
@@ -53,6 +55,8 @@ const AdminLayout = () => {
             // Mock logout
             localStorage.removeItem('token');
             window.location.href = '/login';
+        } else if (key) {
+            navigate(key);
         }
     };
 
@@ -95,6 +99,7 @@ const AdminLayout = () => {
                     mode="inline"
                     selectedKeys={[location.pathname]}
                     items={menuItems}
+                    onClick={handleMenuClick} // Add click handler
                     className="bg-transparent border-r-0 mt-4 px-2"
                     style={{ background: 'transparent' }}
                 />

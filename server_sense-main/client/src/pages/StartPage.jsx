@@ -14,11 +14,13 @@ const StartPage = () => {
                 <section id="features">
                     <Features />
                 </section>
-                <section id="security">
+                <section id="docs">
                     <SecurityFeatures />
                 </section>
             </main>
-            <Footer />
+            <div id="about">
+                <Footer />
+            </div>
         </div>
     );
 };

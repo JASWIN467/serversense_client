@@ -1,21 +1,36 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Checkbox } from 'antd';
+import { Form, Input, Button, Checkbox, message } from 'antd';
 import { UserOutlined, LockOutlined, GoogleOutlined, GithubOutlined, TeamOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import Threads from '../../pages/Threads/Threads';
+import { authService } from '../../services/authService';
 
 const LoginPage = () => {
     const navigate = useNavigate();
     const [role, setRole] = useState('admin'); // 'admin' | 'user'
+    const [loading, setLoading] = useState(false);
 
-    const onFinish = (values) => {
-        console.log('Received values of form: ', { ...values, role });
-        // Mock login success - redirect based on role
-        if (role === 'admin') {
-            navigate('/admin');
-        } else {
-            navigate('/user/dashboard'); // Future user dashboard path
+    const onFinish = async (values) => {
+        setLoading(true);
+        try {
+            const data = await authService.login({
+                username: values.username,
+                password: values.password
+            });
+
+            message.success('Login successful');
+
+            // Redirect based on role in response
+            if (data.user.role === 'admin') {
+                navigate('/admin');
+            } else {
+                navigate('/user/dashboard');
+            }
+        } catch (error) {
+            message.error(error.message || 'Login failed');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -128,8 +143,8 @@ const LoginPage = () => {
                                 type="primary"
                                 htmlType="submit"
                                 className={`w-full h-12 border-none font-bold text-lg rounded-lg hover:scale-[1.02] transition-all duration-200 ${role === 'admin'
-                                        ? 'bg-primary shadow-[0_0_20px_rgba(14,165,233,0.3)] hover:shadow-[0_0_30px_rgba(14,165,233,0.5)]'
-                                        : 'bg-secondary shadow-[0_0_20px_rgba(217,70,239,0.3)] hover:shadow-[0_0_30px_rgba(217,70,239,0.5)]'
+                                    ? 'bg-primary shadow-[0_0_20px_rgba(14,165,233,0.3)] hover:shadow-[0_0_30px_rgba(14,165,233,0.5)]'
+                                    : 'bg-secondary shadow-[0_0_20px_rgba(217,70,239,0.3)] hover:shadow-[0_0_30px_rgba(217,70,239,0.5)]'
                                     }`}
                             >
                                 Log in as {role === 'admin' ? 'Administrator' : 'User'}
