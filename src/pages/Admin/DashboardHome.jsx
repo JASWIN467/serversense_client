@@ -6,7 +6,16 @@ import {
     DesktopOutlined,
     DashboardOutlined,
     RiseOutlined,
-    ClockCircleOutlined
+    ClockCircleOutlined,
+    AreaChartOutlined,
+    PieChartOutlined,
+    CloudSyncOutlined,
+    GatewayOutlined,
+    DatabaseOutlined,
+    ApiOutlined,
+    SafetyCertificateOutlined,
+    NodeIndexOutlined,
+    ArrowRightOutlined
 } from '@ant-design/icons';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
 
@@ -241,6 +250,160 @@ const PerformanceTab = ({ data }) => {
     );
 };
 
+// --- TAB 3: INSIGHTS ---
+
+const CapacitySnapshot = () => (
+    <GlassPanel className="p-6 h-full">
+        <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                <PieChartOutlined className="text-purple-500" />
+                Capacity Planning Snapshot
+            </h3>
+            <span className="text-xs font-mono text-purple-400 bg-purple-500/10 px-2 py-1 rounded">Future Risk Analysis</span>
+        </div>
+
+        <div className="space-y-8">
+            {/* Disk Trend Prediction */}
+            <div className="bg-white/5 rounded-xl p-4 border border-white/5 relative overflow-hidden group hover:border-red-500/30 transition-colors">
+                <div className="absolute top-0 right-0 p-2 opacity-50">
+                    <WarningOutlined className="text-red-500 text-xl animate-pulse" />
+                </div>
+                <div className="flex justify-between items-end mb-2">
+                    <div>
+                        <p className="text-gray-400 text-xs uppercase font-bold tracking-wider">Storage forecast</p>
+                        <p className="text-white font-medium mt-1">Disk expected to reach <span className="text-red-400">90%</span> in <span className="text-white font-bold text-lg">12 Days</span></p>
+                    </div>
+                </div>
+                <div className="h-2 w-full bg-gray-800 rounded-full overflow-hidden mb-2">
+                    <div className="h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 w-[78%]" />
+                </div>
+                <p className="text-[11px] text-gray-500 flex items-center gap-2">
+                    <ArrowRightOutlined className="rotate-[-45deg] text-red-500" /> Trend: Accelerating (+1.2GB/day)
+                </p>
+            </div>
+
+            {/* Other Trends */}
+            <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                    <p className="text-gray-400 text-xs uppercase font-bold tracking-wider mb-2">CPU Trend</p>
+                    <div className="flex items-center gap-2">
+                        <ArrowRightOutlined className="rotate-[-15deg] text-amber-500" />
+                        <span className="text-amber-400 font-medium">Increasing Slowly</span>
+                    </div>
+                    <p className="text-[10px] text-gray-600 mt-1">Week-over-week +5%</p>
+                </div>
+                <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                    <p className="text-gray-400 text-xs uppercase font-bold tracking-wider mb-2">RAM Usage</p>
+                    <div className="flex items-center gap-2">
+                        <ArrowRightOutlined className="text-emerald-500" />
+                        <span className="text-emerald-400 font-medium">Stable</span>
+                    </div>
+                    <p className="text-[10px] text-gray-600 mt-1">Avg 65% utilization</p>
+                </div>
+            </div>
+
+            {/* Recommendation */}
+            <div className="bg-sky-500/10 border border-sky-500/20 rounded-xl p-4 flex gap-3">
+                <div className="mt-1"><SafetyCertificateOutlined className="text-sky-400 text-lg" /></div>
+                <div>
+                    <h4 className="text-sky-100 font-medium text-sm">AI Recommendation</h4>
+                    <p className="text-sky-300/80 text-xs mt-1 leading-relaxed">
+                        Scale storage volume <strong>vol-0a3</strong> by 200GB before Dec 14 to avoid outage.
+                    </p>
+                    <button className="mt-3 text-[10px] bg-sky-500 hover:bg-sky-400 text-white px-3 py-1.5 rounded transition-colors font-medium">
+                        Simulate Scaling
+                    </button>
+                </div>
+            </div>
+        </div>
+    </GlassPanel>
+);
+
+const ServiceDependencyMap = () => (
+    <GlassPanel className="p-6 h-full">
+        <div className="flex items-center justify-between mb-8">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                <NodeIndexOutlined className="text-emerald-500" />
+                Service Dependency Map
+            </h3>
+            <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">Live Topology</span>
+        </div>
+
+        {/* Map Visualization */}
+        <div className="relative flex items-center justify-center p-4 min-h-[300px]">
+            {/* Connecting Lines (Simulated with absolute positioning or simplified flex row) */}
+            <div className="flex items-center gap-4 w-full justify-center">
+
+                {/* Nodes */}
+                <div className="flex flex-col items-center gap-2">
+                    <div className="w-16 h-16 rounded-full bg-[#111] border-2 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.2)] flex items-center justify-center z-10">
+                        <DesktopOutlined className="text-xl text-emerald-500" />
+                    </div>
+                    <span className="text-xs text-gray-400 font-mono">Client</span>
+                </div>
+
+                <div className="h-[2px] w-12 bg-emerald-500/30" />
+
+                <div className="flex flex-col items-center gap-2">
+                    <div className="w-20 h-20 rounded-xl bg-[#111] border-2 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)] flex flex-col items-center justify-center z-10 relative">
+                        <ApiOutlined className="text-2xl text-emerald-500 mb-1" />
+                        <span className="text-[10px] font-bold text-white">API GW</span>
+                        {/* Traffic Dots */}
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full animate-ping" />
+                    </div>
+                </div>
+
+                <div className="h-[2px] w-12 bg-emerald-500/30" />
+
+                {/* Branching */}
+                <div className="flex flex-col gap-8">
+                    {/* Auth Service */}
+                    <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 rounded-lg bg-[#111] border border-emerald-500/50 flex flex-col items-center justify-center">
+                            <SafetyCertificateOutlined className="text-lg text-emerald-400 mb-1" />
+                            <span className="text-[10px] text-gray-300">Auth</span>
+                        </div>
+                    </div>
+                    {/* Database */}
+                    <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 rounded-lg bg-[#111] border border-emerald-500/50 flex flex-col items-center justify-center">
+                            <DatabaseOutlined className="text-lg text-blue-400 mb-1" />
+                            <span className="text-[10px] text-gray-300">Main DB</span>
+                        </div>
+                        <div className="h-[2px] w-8 bg-dashed bg-gray-700" />
+                        <div className="w-14 h-14 rounded-lg bg-[#111] border border-gray-700 flex flex-col items-center justify-center opacity-75">
+                            <CloudSyncOutlined className="text-lg text-amber-500 mb-1" />
+                            <span className="text-[9px] text-gray-500">Cache</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-3 gap-2 text-[10px] text-gray-500 text-center">
+            <div className="bg-emerald-500/5 p-2 rounded border border-emerald-500/10">
+                <span className="block text-emerald-500 font-bold text-lg">99.9%</span>
+                Uptime
+            </div>
+            <div className="bg-blue-500/5 p-2 rounded border border-blue-500/10">
+                <span className="block text-blue-400 font-bold text-lg">45ms</span>
+                Avg Latency
+            </div>
+            <div className="bg-amber-500/5 p-2 rounded border border-amber-500/10">
+                <span className="block text-amber-400 font-bold text-lg">0.01%</span>
+                Error Rate
+            </div>
+        </div>
+    </GlassPanel>
+);
+
+const InsightsTab = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+        <CapacitySnapshot />
+        <ServiceDependencyMap />
+    </div>
+);
+
 // --- DATA GENERATION ---
 const generateData = (count = 20) => {
     return Array.from({ length: count }, (_, i) => ({
@@ -299,6 +462,11 @@ const DashboardHome = () => {
             key: '2',
             label: <span className="flex items-center gap-2 px-2 py-1"><RiseOutlined /> Performance</span>,
             children: <PerformanceTab data={data} />
+        },
+        {
+            key: '3',
+            label: <span className="flex items-center gap-2 px-2 py-1"><NodeIndexOutlined /> Insights</span>,
+            children: <InsightsTab />
         }
     ];
 

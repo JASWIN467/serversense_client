@@ -98,42 +98,7 @@ const Settings = () => {
         </SettingSection>
     );
 
-    const NotificationSettings = () => (
-        <SettingSection title="Notifications">
-            <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-blue-500/10 p-2 rounded-lg text-blue-500"><BellOutlined /></div>
-                        <div>
-                            <p className="text-gray-200 font-medium">Email Notifications</p>
-                            <p className="text-gray-500 text-xs">Receive daily summaries and critical alerts via email</p>
-                        </div>
-                    </div>
-                    <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-purple-500/10 p-2 rounded-lg text-purple-500"><GlobalOutlined /></div>
-                        <div>
-                            <p className="text-gray-200 font-medium">Browser Push</p>
-                            <p className="text-gray-500 text-xs">Real-time alerts on your desktop</p>
-                        </div>
-                    </div>
-                    <Switch defaultChecked />
-                </div>
-                <div className="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 transition-colors">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-amber-500/10 p-2 rounded-lg text-amber-500"><WarningOutlined /></div>
-                        <div>
-                            <p className="text-gray-200 font-medium">Critical Alerts Only</p>
-                            <p className="text-gray-500 text-xs">Suppress info and warning level notifications</p>
-                        </div>
-                    </div>
-                    <Switch />
-                </div>
-            </div>
-        </SettingSection>
-    );
+
 
     const SecuritySettings = () => (
         <SettingSection title="Security & Authentication">
@@ -291,7 +256,7 @@ const Settings = () => {
     // Ant Design items for Tabs
     const items = [
         { key: '1', label: <span className="flex items-center gap-2"><UserOutlined /> Profile</span>, children: <ProfileSettings /> },
-        { key: '2', label: <span className="flex items-center gap-2"><BellOutlined /> Notifications</span>, children: <NotificationSettings /> }
+        { key: '2', label: <span className="flex items-center gap-2"><SettingOutlined /> Thresholds</span>, children: <ThresholdSettings /> }
     ];
 
     return (
