@@ -1,6 +1,6 @@
 import { message } from 'antd';
 
-const API_URL = 'http://localhost:5000/api/auth';
+const API_URL = 'https://serversense-server.onrender.com/api/auth';
 
 export const authService = {
     register: async (userData) => {
