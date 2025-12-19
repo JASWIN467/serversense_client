@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Tag, Button, Input, Avatar, Space, Dropdown, message } from 'antd';
+import { Table, Tag, Button, Input, Avatar, Space, Dropdown, message, Modal, Form, Select } from 'antd';
 import {
     SearchOutlined,
     UserOutlined,
@@ -8,8 +8,14 @@ import {
     StopOutlined,
     CheckCircleOutlined,
     TeamOutlined,
-    KeyOutlined
+    KeyOutlined,
+    EditOutlined,
+    DeleteOutlined,
+    ExclamationCircleOutlined
 } from '@ant-design/icons';
+
+const { Option } = Select;
+const { confirm } = Modal;
 
 const GlassPanel = ({ children, className = '' }) => (
     <div className={`relative overflow-hidden rounded-xl border border-white/10 bg-[#0a0a0a]/80 backdrop-blur-xl shadow-xl ${className}`}>
@@ -21,6 +27,12 @@ const UserList = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
+
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState('create'); // 'create' | 'edit'
+    const [editingUser, setEditingUser] = useState(null);
+    const [form] = Form.useForm();
 
     useEffect(() => {
         fetchUsers();
@@ -44,13 +56,103 @@ const UserList = () => {
         }
     };
 
-    const handleMenuClick = (e, record) => {
-        if (e.key === 'deactivate') {
-            message.success(`Deactivated user ${record.username}`);
-        } else if (e.key === 'promote') {
-            message.success(`Promoted ${record.username} to Admin`);
+    // --- Actions ---
+
+    const handleInvite = () => {
+        setModalMode('create');
+        setEditingUser(null);
+        form.resetFields();
+        setIsModalOpen(true);
+    };
+
+    const handleEdit = (user) => {
+        setModalMode('edit');
+        setEditingUser(user);
+        form.setFieldsValue({
+            username: user.username,
+            email: user.email,
+            role: user.role
+        });
+        setIsModalOpen(true);
+    };
+
+    const handleDelete = (user) => {
+        confirm({
+            title: 'Are you sure you want to delete this user?',
+            icon: <ExclamationCircleOutlined className="text-red-500" />,
+            content: `This action cannot be undone. User ${user.username} will be permanently removed.`,
+            okText: 'Delete',
+            okType: 'danger',
+            cancelText: 'Cancel',
+            centered: true,
+            className: 'glass-modal',
+            onOk: async () => {
+                try {
+                    const response = await fetch(`https://serversense-server.onrender.com/api/users/${user._id}`, {
+                        method: 'DELETE',
+                    });
+                    if (response.ok) {
+                        message.success('User deleted successfully');
+                        fetchUsers();
+                    } else {
+                        message.error('Failed to delete user');
+                    }
+                } catch (error) {
+                    message.error('Error deleting user');
+                }
+            },
+        });
+    };
+
+    const handleRoleChange = async (user) => {
+        const newRole = user.role === 'admin' ? 'user' : 'admin';
+        try {
+            const response = await fetch(`https://serversense-server.onrender.com/api/users/${user._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role: newRole })
+            });
+            if (response.ok) {
+                message.success(`Role updated to ${newRole.toUpperCase()}`);
+                fetchUsers();
+            } else {
+                message.error('Failed to update role');
+            }
+        } catch (error) {
+            message.error('Error updating role');
         }
     };
+
+    const handleModalOk = async () => {
+        try {
+            const values = await form.validateFields();
+            const url = modalMode === 'create'
+                ? 'https://serversense-server.onrender.com/api/auth/register'
+                : `https://serversense-server.onrender.com/api/users/${editingUser._id}`;
+
+            const method = modalMode === 'create' ? 'POST' : 'PUT';
+
+            const response = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(values)
+            });
+
+            if (response.ok) {
+                message.success(modalMode === 'create' ? 'User invited successfully' : 'User updated successfully');
+                setIsModalOpen(false);
+                fetchUsers();
+            } else {
+                const errorData = await response.json();
+                message.error(errorData.message || 'Operation failed');
+            }
+        } catch (error) {
+            console.error(error);
+            // Form validation error or network error
+        }
+    };
+
+    // --- Columns ---
 
     const columns = [
         {
@@ -116,12 +218,11 @@ const UserList = () => {
                 <Dropdown
                     menu={{
                         items: [
-                            { key: 'edit', label: 'Edit Profile' },
-                            { key: 'promote', label: 'Change Role' },
+                            { key: 'edit', label: 'Edit Profile', icon: <EditOutlined />, onClick: () => handleEdit(record) },
+                            { key: 'promote', label: record.role === 'admin' ? 'Demote to User' : 'Promote to Admin', icon: <SafetyCertificateOutlined />, onClick: () => handleRoleChange(record) },
                             { type: 'divider' },
-                            { key: 'deactivate', label: 'Deactivate', danger: true, icon: <StopOutlined /> }
-                        ],
-                        onClick: (e) => handleMenuClick(e, record)
+                            { key: 'deactivate', label: 'Delete User', danger: true, icon: <DeleteOutlined />, onClick: () => handleDelete(record) }
+                        ]
                     }}
                     trigger={['click']}
                 >
@@ -157,6 +258,7 @@ const UserList = () => {
                     <Button
                         type="primary"
                         icon={<TeamOutlined />}
+                        onClick={handleInvite}
                         className="bg-secondary border-none hover:bg-secondary/80 shadow-[0_0_15px_rgba(217,70,239,0.3)]"
                     >
                         Invite User
@@ -175,6 +277,63 @@ const UserList = () => {
                     className="custom-table"
                 />
             </GlassPanel>
+
+            {/* Modal */}
+            <Modal
+                title={modalMode === 'create' ? "Invite New User" : "Edit User Profile"}
+                open={isModalOpen}
+                onOk={handleModalOk}
+                onCancel={() => setIsModalOpen(false)}
+                okText={modalMode === 'create' ? "Create User" : "Save Changes"}
+                cancelText="Cancel"
+                className="glass-modal"
+                centered
+            >
+                <Form
+                    form={form}
+                    layout="vertical"
+                    name="userForm"
+                    initialValues={{ role: 'user' }}
+                >
+                    <Form.Item
+                        name="username"
+                        label="Username"
+                        rules={[{ required: true, message: 'Please input the username!' }]}
+                    >
+                        <Input placeholder="Enter username" />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="email"
+                        label="Email"
+                        rules={[
+                            { required: true, message: 'Please input the email!' },
+                            { type: 'email', message: 'Please enter a valid email!' }
+                        ]}
+                    >
+                        <Input placeholder="Enter email address" />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="role"
+                        label="Role"
+                        rules={[{ required: true, message: 'Please select a role!' }]}
+                    >
+                        <Select>
+                            <Option value="user">User</Option>
+                            <Option value="admin">Admin</Option>
+                        </Select>
+                    </Form.Item>
+
+                    <Form.Item
+                        name="password"
+                        label={modalMode === 'create' ? "Password" : "New Password (Optional)"}
+                        rules={[{ required: modalMode === 'create', message: 'Please input the password!' }]}
+                    >
+                        <Input.Password placeholder={modalMode === 'create' ? "Enter password" : "Leave blank to keep current"} />
+                    </Form.Item>
+                </Form>
+            </Modal>
         </div>
     );
 };
