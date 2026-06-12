@@ -54,7 +54,7 @@ const AdminLayout = () => {
         if (key === 'logout') {
             // Mock logout
             localStorage.removeItem('token');
-            window.location.href = '/login';
+            navigate('/login');
         } else if (key) {
             navigate(key);
         }
